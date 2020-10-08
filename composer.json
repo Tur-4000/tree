@@ -21,6 +21,7 @@
     "autoload": {
         "files": [
             "src/removeFirstLevel.php",
+            "src/generator.php",
             "src/du.php"
         ]
     }
