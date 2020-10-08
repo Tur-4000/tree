@@ -9,6 +9,7 @@ use function Php\Immutable\Fs\Trees\trees\mkfile;
 use function Php\Immutable\Fs\Trees\trees\getChildren;
 use function App\removeFirstLevel\removeFirstLevel;
 use function App\generator\generator;
+use function App\tree\compressImages;
 use function App\du\du;
 use function App\du\getDirSize;
 
@@ -113,6 +114,37 @@ class Test extends TestCase
         $actual = generator();
         
         $this->assertEquals($tree, $actual);
+    }
+
+    // test compressImages()
+    public function testCompressImages1()
+    {
+        $tree = mkdir('my documents', [
+                    mkdir('documents.jpg'),
+                    mkfile('avatar.jpg', ['size' => 100]),
+                    mkfile('passport.jpg', ['size' => 200]),
+                    mkfile('family.jpg', ['size' => 150]),
+                    mkfile('addresses', ['size' => 125]),
+                    mkdir('presentations')
+            ], [ 'test' => 'haha']);
+
+        $newTree = compressImages($tree);
+        
+        $expectation = [
+            'name' => 'my documents',
+            'children' => [
+                ['name' => 'documents.jpg', 'children' => [], 'meta' => [], 'type' => 'directory'],
+                ['name' => 'avatar.jpg', 'meta' => ['size' => 50], 'type' => 'file'],
+                ['name' => 'passport.jpg', 'meta' => ['size' => 100], 'type' => 'file'],
+                ['name' => 'family.jpg', 'meta' => ['size' => 75], 'type' => 'file'],
+                ['name' => 'addresses', 'meta' => ['size' => 125], 'type' => 'file'],
+                ['name' => 'presentations', 'children' => [], 'meta' => [], 'type' => 'directory']
+            ],
+            'meta' => ['test' => 'haha'],
+            'type' => 'directory'
+        ];
+        
+        $this->assertEquals($expectation, $newTree);
     }
 
     // test du()
