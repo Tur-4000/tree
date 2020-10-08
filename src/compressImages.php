@@ -9,7 +9,7 @@ use function Php\Immutable\Fs\Trees\trees\getChildren;
 use function Php\Immutable\Fs\Trees\trees\getName;
 use function Php\Immutable\Fs\Trees\trees\getMeta;
 
-function isImage($node): bool
+function isImage(array $node): bool
 {
     $images = ['.jpg', '.jpeg', '.png', '.gif', '.bmp'];
     $name = getName($node);
@@ -25,7 +25,7 @@ function compressImages(array $tree): array
     $newChildren = array_map(function ($node) {
         if (isFile($node) && isImage($node)) {
             $newMeta = getMeta($node);
-            $newMeta['size'] = $newMeta['size'] / 2;
+            $newMeta['size'] /= 2;
 
             return mkfile(getName($node), $newMeta);
         }
