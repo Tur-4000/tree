@@ -3,6 +3,7 @@
 namespace App\Tests;
 
 use PHPUnit\Framework\TestCase;
+use ArrayObject;
 
 use function Php\Immutable\Fs\Trees\trees\mkdir;
 use function Php\Immutable\Fs\Trees\trees\mkfile;
@@ -10,7 +11,7 @@ use function Php\Immutable\Fs\Trees\trees\getChildren;
 use function App\removeFirstLevel\removeFirstLevel;
 use function App\generator\generator;
 use function App\tree\compressImages;
-use function App\tree\downcaseFileNames\downcaseFileNames;
+use function App\downcaseFileNames\downcaseFileNames;
 use function App\du\du;
 use function App\du\getDirSize;
 
