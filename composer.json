@@ -1,4 +1,14 @@
 {
+    "name": "tur/virtual-fs-tree",
+    "description": "Virtual file system",
+    "license": "MIT",
+    "keywords": ["trees"],
+    "authors": [
+        {
+            "name": "Valeriy Turbanov",
+            "email": "tur.4000@gmail.com"
+        }
+    ],
     "require": {
         "php":">=7.4.0",
         "hexlet/trees": "dev-master"
