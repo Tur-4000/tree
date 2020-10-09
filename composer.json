@@ -33,6 +33,7 @@
             "src/removeFirstLevel.php",
             "src/generator.php",
             "src/compressImages.php",
+            "src/downcaseFileNames.php",
             "src/du.php"
         ]
     }

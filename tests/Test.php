@@ -10,6 +10,7 @@ use function Php\Immutable\Fs\Trees\trees\getChildren;
 use function App\removeFirstLevel\removeFirstLevel;
 use function App\generator\generator;
 use function App\tree\compressImages;
+use function App\tree\downcaseFileNames\downcaseFileNames;
 use function App\du\du;
 use function App\du\getDirSize;
 
@@ -145,6 +146,116 @@ class Test extends TestCase
         ];
         
         $this->assertEquals($expectation, $newTree);
+    }
+
+    // test downcaseFileNames()
+    public function testBeImmutable()
+    {
+        $tree = mkdir('/', [
+          mkdir('eTc', [
+            mkdir('NgiNx'),
+            mkdir('CONSUL', [
+              mkfile('config.json'),
+            ]),
+          ]),
+          mkfile('hOsts'),
+        ]);
+
+        $obj = new ArrayObject($tree);
+        $origin = $obj->getArrayCopy();
+
+        downcaseFileNames($tree);
+
+        $this->assertEquals($tree, $origin);
+    }
+
+    public function testDowncaseFileNames()
+    {
+        $tree = mkdir('/', [
+          mkdir('eTc', [
+            mkdir('NgiNx'),
+            mkdir('CONSUL', [
+              mkfile('config.JSON'),
+            ]),
+          ]),
+          mkfile('hOsts'),
+        ]);
+
+        $actual = downcaseFileNames($tree);
+        $expected = [
+          'children' => [
+            [
+              'children' => [
+                [
+                  'children' => [],
+                  'meta' => [],
+                  'name' => 'NgiNx',
+                  'type' => 'directory',
+                ],
+                [
+                  'children' => [['meta' => [], 'name' => 'config.json', 'type' => 'file']],
+                  'meta' => [],
+                  'name' => 'CONSUL',
+                  'type' => 'directory',
+                ],
+              ],
+              'meta' => [],
+              'name' => 'eTc',
+              'type' => 'directory',
+            ],
+            ['meta' => [], 'name' => 'hosts', 'type' => 'file'],
+          ],
+          'meta' => [],
+          'name' => '/',
+          'type' => 'directory',
+        ];
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testReturnFullCopy()
+    {
+        $tree = mkdir('/', [
+          mkdir('eTc', [
+            mkdir('NgiNx', [], ['size' => 4000]),
+            mkdir('CONSUL', [
+              mkfile('config.JSON', ['uid' => 0]),
+            ]),
+          ]),
+          mkfile('hOsts'),
+        ]);
+
+        $actual = downcaseFileNames($tree);
+        $expected = [
+          'children' => [
+            [
+              'children' => [
+                [
+                  'children' => [],
+                  'meta' => ['size' => 4000],
+                  'name' => 'NgiNx',
+                  'type' => 'directory',
+                ],
+                [
+
+                  'children' => [['meta' => ['uid' => 0], 'name' => 'config.json', 'type' => 'file']],
+                  'meta' => [],
+                  'name' => 'CONSUL',
+                  'type' => 'directory',
+                ],
+              ],
+              'meta' => [],
+              'name' => 'eTc',
+              'type' => 'directory',
+            ],
+            ['meta' => [], 'name' => 'hosts', 'type' => 'file'],
+          ],
+          'meta' => [],
+          'name' => '/',
+          'type' => 'directory',
+        ];
+
+        $this->assertEquals($expected, $actual);
     }
 
     // test du()
