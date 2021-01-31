@@ -14,6 +14,10 @@ use function App\tree\compressImages;
 use function App\downcaseFileNames\downcaseFileNames;
 use function App\du\du;
 use function App\du\getDirSize;
+use function App\findFilesByName\findFilesByName;
+{
+  # code...
+}
 
 class Test extends TestCase
 {
@@ -259,81 +263,128 @@ class Test extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    // test du()
-    // public function testDirSize()
-    // {
-    //     $tree = mkdir('/', [
-    //         mkdir('etc', [
-    //             mkdir('apache'),
-    //             mkdir('nginx', [
-    //                 mkfile('nginx.conf', ['size' => 800]),
-    //             ]),
-    //             mkdir('consul', [
-    //                 mkfile('config.json', ['size' => 1200]),
-    //                 mkfile('data', ['size' => 8200]),
-    //                 mkfile('raft', ['size' => 80]),
-    //             ]),
-    //         ]),
-    //         mkfile('hosts', ['size' => 3500]),
-    //         mkfile('resolve', ['size' => 1000]),
-    //     ]);
+    /**
+     * test du()
+     */
+    public function testDuTree()
+    {
+        $tree = mkdir('/', [
+            mkdir('etc', [
+                mkdir('apache'),
+                mkdir('nginx', [
+                    mkfile('nginx.conf', ['size' => 800]),
+                ]),
+                mkdir('consul', [
+                    mkfile('config.json', ['size' => 1200]),
+                    mkfile('data', ['size' => 8200]),
+                    mkfile('raft', ['size' => 80]),
+                ]),
+            ]),
+            mkfile('hosts', ['size' => 3500]),
+            mkfile('resolve', ['size' => 1000]),
+        ]);
 
-    //     $expected = 13880;
+        $expected = [
+            ['etc', 10280],
+            ['hosts', 3500],
+            ['resolve', 1000],
+        ];
 
-    //     $this->assertEquals($expected, getDirSize($tree));
-    // }
+        $this->assertEquals($expected, du($tree));
+    }
 
-    // public function testDuTree()
-    // {
-    //     $tree = mkdir('/', [
-    //         mkdir('etc', [
-    //             mkdir('apache'),
-    //             mkdir('nginx', [
-    //                 mkfile('nginx.conf', ['size' => 800]),
-    //             ]),
-    //             mkdir('consul', [
-    //                 mkfile('config.json', ['size' => 1200]),
-    //                 mkfile('data', ['size' => 8200]),
-    //                 mkfile('raft', ['size' => 80]),
-    //             ]),
-    //         ]),
-    //         mkfile('hosts', ['size' => 3500]),
-    //         mkfile('resolve', ['size' => 1000]),
-    //     ]);
+    public function testDuChildren()
+    {
+        $tree = mkdir('/', [
+            mkdir('etc', [
+                mkdir('apache'),
+                mkdir('nginx', [
+                    mkfile('nginx.conf', ['size' => 800]),
+                ]),
+                mkdir('consul', [
+                    mkfile('config.json', ['size' => 1200]),
+                    mkfile('data', ['size' => 8200]),
+                    mkfile('raft', ['size' => 80]),
+                ]),
+            ]),
+            mkfile('hosts', ['size' => 3500]),
+            mkfile('resolve', ['size' => 1000]),
+        ]);
 
-    //     $expected = [
-    //         ['etc', 10280],
-    //         ['hosts', 3500],
-    //         ['resolve', 1000],
-    //     ];
+        $expected = [
+            ['consul', 9480],
+            ['nginx', 800],
+            ['apache', 0],
+        ];
 
-    //     $this->assertEquals($expected, du($tree));
-    // }
+        $this->assertEquals($expected, du(getChildren($tree)[0]));
+    }
 
-    // public function testDuChildren()
-    // {
-    //     $tree = mkdir('/', [
-    //         mkdir('etc', [
-    //             mkdir('apache'),
-    //             mkdir('nginx', [
-    //                 mkfile('nginx.conf', ['size' => 800]),
-    //             ]),
-    //             mkdir('consul', [
-    //                 mkfile('config.json', ['size' => 1200]),
-    //                 mkfile('data', ['size' => 8200]),
-    //                 mkfile('raft', ['size' => 80]),
-    //             ]),
-    //         ]),
-    //         mkfile('hosts', ['size' => 3500]),
-    //         mkfile('resolve', ['size' => 1000]),
-    //     ]);
+    /**
+     * test findFilesByName
+     */
+    public function testFindFilesByName1()
+    {
+        $tree = mkdir('/', [
+            mkdir('etc', [
+                mkdir('apache'),
+                mkdir('nginx', [
+                    mkfile('nginx.conf', ['size' => 800]),
+                ]),
+                mkdir('consul', [
+                    mkfile('config.json', ['size' => 1200]),
+                    mkfile('data', ['size' => 8200]),
+                    mkfile('raft', ['size' => 80]),
+                ]),
+            ]),
+            mkfile('hosts', ['size' => 3500]),
+            mkfile('resolve', ['size' => 1000]),
+        ]);
 
-    //     $expected = [
-    //         ['consul', 9480],
-    //         ['nginx', 800],
-    //         ['apache', 0],
-    //     ];
+        $expected = ['/etc/nginx/nginx.conf', '/etc/consul/config.json'];
 
-    //     $this->assertEquals($expected, du(getChildren($tree)[0]));
-    // }
+        $this->assertEquals($expected, findFilesByName($tree, 'co'));
+    }
+
+    public function testFindFilesByName2()
+    {
+        $tree = mkdir('/', [
+            mkdir('etc', [
+                mkdir('apache'),
+                mkdir('nginx', [
+                    mkfile('nginx.conf', ['size' => 800]),
+                ]),
+                mkdir('consul', [
+                    mkfile('config.json', ['size' => 1200]),
+                    mkfile('data', ['size' => 8200]),
+                    mkfile('raft', ['size' => 80]),
+                ]),
+            ]),
+            mkfile('hosts', ['size' => 3500]),
+            mkfile('resolve', ['size' => 1000]),
+        ]);
+
+        $this->assertEquals([], findFilesByName($tree, 'toohard'));
+    }
+
+    public function testFindFilesByName3()
+    {
+        $tree = mkdir('/', [
+            mkdir('etc', [
+                mkdir('apache'),
+                mkdir('nginx', [
+                    mkfile('nginx.conf', ['size' => 800]),
+                ]),
+                mkdir('consul', [
+                    mkfile('config.json', ['size' => 1200]),
+                    mkfile('data', ['size' => 8200]),
+                    mkfile('raft', ['size' => 80]),
+                ]),
+            ]),
+            mkfile('hosts', ['size' => 3500]),
+            mkfile('resolve', ['size' => 1000]),
+        ]);
+
+        $this->assertEquals(['/etc/consul/data'], findFilesByName($tree, 'data'));
+    }
 }

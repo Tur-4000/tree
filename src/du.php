@@ -8,40 +8,38 @@ use function Php\Immutable\Fs\Trees\trees\getName;
 use function Php\Immutable\Fs\Trees\trees\getMeta;
 use function Php\Immutable\Fs\Trees\trees\getChildren;
 
-function getFileSize($file)
+function getFileSize(array $file): int
 {
     return getMeta($file)['size'];
 }
 
-function getDirSize($dir)
+function getDirectorySize(array $tree): int
 {
-    $size = array_map(function ($node) {
-        print_r($node);
-        if (isDirectory($node)) {
-            $children = getChildren($node);
-            return getDirSize($children);
+    $size = 0;
+    $children = getChildren($tree);
+    
+    foreach ($children as $node) {
+        if (!isDirectory($node)) {
+            $size += getFileSize($node);
+        } else {
+            $size += getDirectorySize($node);
         }
-
-        return getFileSize($node);
-    }, $dir);
-
-    return array_sum($size);
+    }
+    
+    return $size;
 }
 
-function du($tree)
+function du(array $tree): array
 {
     $children = getChildren($tree);
-    $result = array_reduce($children, function ($acc, $node) {
-        var_dump($node);
-        $name = getName($node);
-        if (isDirectory($node)) {
-            $size = getDirSize($node);
-        } else {
-            $size = getFileSize($node);
-        }
+    
+    $du = array_map(function ($child) {
+        return isDirectory($child) ?
+            [getName($child), getDirectorySize($child)] :
+            [getName($child), getFileSize($child)];
+    }, $children);
+    
+    usort($du, fn($a, $b) => $b[1] <=> $a[1]);
 
-        return $acc[] = [$name => $size];
-    }, $acc = []);
-
-    return $result;
+    return $du;
 }
