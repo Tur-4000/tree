@@ -31,7 +31,7 @@ function downcaseFileNames(array $tree): array
 
     /**
      * Решение учителя
-     * 
+     *
      * $name = getName($node);
      *
      * if (isFile($node)) {

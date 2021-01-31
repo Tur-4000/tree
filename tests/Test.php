@@ -13,11 +13,7 @@ use function App\generator\generator;
 use function App\tree\compressImages;
 use function App\downcaseFileNames\downcaseFileNames;
 use function App\du\du;
-use function App\du\getDirSize;
 use function App\findFilesByName\findFilesByName;
-{
-  # code...
-}
 
 class Test extends TestCase
 {
