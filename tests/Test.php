@@ -114,7 +114,7 @@ class Test extends TestCase
         ];
 
         $actual = generator();
-        
+
         $this->assertEquals($tree, $actual);
     }
 
@@ -131,7 +131,7 @@ class Test extends TestCase
             ], [ 'test' => 'haha']);
 
         $newTree = compressImages($tree);
-        
+
         $expectation = [
             'name' => 'my documents',
             'children' => [
@@ -145,7 +145,7 @@ class Test extends TestCase
             'meta' => ['test' => 'haha'],
             'type' => 'directory'
         ];
-        
+
         $this->assertEquals($expectation, $newTree);
     }
 
@@ -300,7 +300,7 @@ class Test extends TestCase
     //         mkfile('hosts', ['size' => 3500]),
     //         mkfile('resolve', ['size' => 1000]),
     //     ]);
-        
+
     //     $expected = [
     //         ['etc', 10280],
     //         ['hosts', 3500],
