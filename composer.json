@@ -34,7 +34,8 @@
             "src/generator.php",
             "src/compressImages.php",
             "src/downcaseFileNames.php",
-            "src/du.php"
+            "src/du.php",
+            "src/findFilesByName.php"
         ]
     }
 }
