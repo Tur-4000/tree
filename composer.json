@@ -35,7 +35,8 @@
             "src/compressImages.php",
             "src/downcaseFileNames.php",
             "src/du.php",
-            "src/findFilesByName.php"
+            "src/findFilesByName.php",
+            "src/Flatten.php"
         ]
     }
 }
