@@ -37,7 +37,8 @@
             "src/du.php",
             "src/findFilesByName.php",
             "src/Flatten.php",
-            "src/Convert.php"
+            "src/Convert.php",
+            "src/itinerary.php"
         ]
     }
 }
